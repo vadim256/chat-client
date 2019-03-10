@@ -43,6 +43,13 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 }
 
 //(*IdInit(ClientFrame)
+const long ClientFrame::ID_SIMPLEHTMLLISTBOX1 = wxNewId();
+const long ClientFrame::ID_TEXTCTRL1 = wxNewId();
+const long ClientFrame::ID_BUTTON1 = wxNewId();
+const long ClientFrame::ID_BUTTON2 = wxNewId();
+const long ClientFrame::ID_PANEL1 = wxNewId();
+const long ClientFrame::idMenuConnect = wxNewId();
+const long ClientFrame::idMenuDisconnect = wxNewId();
 const long ClientFrame::idMenuQuit = wxNewId();
 const long ClientFrame::idMenuAbout = wxNewId();
 const long ClientFrame::ID_STATUSBAR1 = wxNewId();
@@ -56,15 +63,45 @@ END_EVENT_TABLE()
 ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
 {
     //(*Initialize(ClientFrame)
+    wxBoxSizer* BoxSizer1;
+    wxBoxSizer* BoxSizer2;
+    wxBoxSizer* BoxSizer3;
+    wxBoxSizer* BoxSizer4;
     wxMenu* Menu1;
     wxMenu* Menu2;
     wxMenuBar* MenuBar1;
     wxMenuItem* MenuItem1;
     wxMenuItem* MenuItem2;
 
-    Create(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
+    Create(parent, id, _("chat-client"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
+    SetClientSize(wxSize(500,500));
+    SetMinSize(wxSize(500,500));
+    BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
+    Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+    BoxSizer2 = new wxBoxSizer(wxVERTICAL);
+    SimpleHtmlListBox1 = new wxSimpleHtmlListBox(Panel1, ID_SIMPLEHTMLLISTBOX1, wxDefaultPosition, wxDefaultSize, 0, 0, wxHLB_DEFAULT_STYLE, wxDefaultValidator, _T("ID_SIMPLEHTMLLISTBOX1"));
+    BoxSizer2->Add(SimpleHtmlListBox1, 3, wxALL|wxEXPAND, 2);
+    BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
+    TextCtrl1 = new wxTextCtrl(Panel1, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_RICH|wxTE_RICH2|wxSIMPLE_BORDER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    BoxSizer3->Add(TextCtrl1, 1, wxALL|wxEXPAND, 1);
+    BoxSizer4 = new wxBoxSizer(wxVERTICAL);
+    Button1 = new wxButton(Panel1, ID_BUTTON1, _("send"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    BoxSizer4->Add(Button1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Button2 = new wxButton(Panel1, ID_BUTTON2, _("clean"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    BoxSizer4->Add(Button2, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer3->Add(BoxSizer4, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer2->Add(BoxSizer3, 1, wxALL|wxEXPAND, 5);
+    Panel1->SetSizer(BoxSizer2);
+    BoxSizer2->Fit(Panel1);
+    BoxSizer2->SetSizeHints(Panel1);
+    BoxSizer1->Add(Panel1, 1, wxALL|wxEXPAND, 5);
+    SetSizer(BoxSizer1);
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
+    MenuItem3 = new wxMenuItem(Menu1, idMenuConnect, _("Connect"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem3);
+    MenuItem4 = new wxMenuItem(Menu1, idMenuDisconnect, _("Disconnect"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem4);
     MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));
@@ -79,7 +116,12 @@ ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
     StatusBar1->SetFieldsCount(1,__wxStatusBarWidths_1);
     StatusBar1->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(StatusBar1);
+    SetSizer(BoxSizer1);
+    Layout();
+    Center();
 
+    Connect(idMenuConnect,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnMenuConnect);
+    Connect(idMenuDisconnect,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnMenuDisconnect);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnAbout);
     //*)
@@ -89,6 +131,10 @@ ClientFrame::~ClientFrame()
 {
     //(*Destroy(ClientFrame)
     //*)
+    if(m_Client){
+        m_Client->Destroy();
+    }
+    m_Client.reset(nullptr);
 }
 
 void ClientFrame::OnQuit(wxCommandEvent& event)
@@ -100,4 +146,12 @@ void ClientFrame::OnAbout(wxCommandEvent& event)
 {
     wxString msg = wxbuildinfo(long_f);
     wxMessageBox(msg, _("Welcome to..."));
+}
+
+void ClientFrame::OnMenuConnect(wxCommandEvent& event)
+{
+}
+
+void ClientFrame::OnMenuDisconnect(wxCommandEvent& event)
+{
 }
