@@ -70,6 +70,7 @@ BEGIN_EVENT_TABLE(ClientFrame,wxFrame)
 END_EVENT_TABLE()
 
 ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
+: m_Client(nullptr)
 {
     //(*Initialize(ClientFrame)
     wxBoxSizer* BoxSizer1;
@@ -84,7 +85,7 @@ ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
 
     Create(parent, id, _("chat-client"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
     SetClientSize(wxSize(500,500));
-    SetMinSize(wxSize(500,500));
+    SetMinSize(wxSize(350,350));
     {
     	wxIcon FrameIcon;
     	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("/home/ameliepulen/project1/chat-client/client_icon.png"))));
@@ -134,7 +135,6 @@ ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
     Layout();
     Center();
 
-    Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ClientFrame::OnTextCtrl2Text);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ClientFrame::OnExportMessage);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ClientFrame::OnCleanMessage);
     Connect(idMenuConnect,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnMenuConnect);
@@ -144,7 +144,6 @@ ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
     //*)
     TextCtrl1->SetValidator(wxGenericValidator(&m_ClientMsg));
     this->Connect(idSocketClient, wxEVT_SOCKET, (wxObjectEventFunction)&ClientFrame::OnClientSocketEvent);
-    m_Client = nullptr;
 }
 
 ClientFrame::~ClientFrame()
@@ -153,8 +152,6 @@ ClientFrame::~ClientFrame()
     //*)
     if(m_Client)
         m_Client->Destroy();
-
-
 }
 
 void ClientFrame::OnQuit(wxCommandEvent& event)
@@ -171,13 +168,13 @@ void ClientFrame::OnAbout(wxCommandEvent& event)
 void ClientFrame::OnMenuConnect(wxCommandEvent& event)
 {
     if(m_Client){
-        TextCtrl2->AppendText(wxString(wxT("[warning] already joined\n")));
+        TextCtrl2->AppendText(wxT("[warning] already joined\n"));
         return;
     }
     wxString hostname = wxGetTextFromUser(wxT("Enter address server"),
                                           wxT("Connection"), wxT("localhost"));
     if(hostname.IsEmpty()){
-        TextCtrl2->AppendText(wxString(wxT("[error] server address not entered\n")));
+        TextCtrl2->AppendText(wxT("[error] server address not entered\n"));
         return;
     }
     wxIPV4address address;
@@ -186,30 +183,30 @@ void ClientFrame::OnMenuConnect(wxCommandEvent& event)
 
     m_Client = new wxSocketClient();
     if(!m_Client){
-        TextCtrl2->AppendText(wxString(wxT("[error] no memory allocated for client\n")));
+        TextCtrl2->AppendText(wxT("[error] no memory allocated for client\n"));
         return;
     }
     m_Client->SetEventHandler(*this, idSocketClient);
-    m_Client->Notify(wxSOCKET_LOST_FLAG|wxSOCKET_INPUT_FLAG);
+    m_Client->SetNotify(wxSOCKET_LOST_FLAG|wxSOCKET_INPUT_FLAG);
     m_Client->Notify(TRUE);
 
     if(m_Client->Connect(address, false) == FALSE) return;
 
     m_Client->WaitOnConnect(3);
     if(m_Client->IsConnected()){
-        TextCtrl2->AppendText(wxString(wxT("[success] connected to the server\n")));
+        TextCtrl2->AppendText(wxT("[success] connected to the server\n"));
     } else {
 	if(m_Client)
 	        delete m_Client;
         m_Client = nullptr;
-        TextCtrl2->AppendText(wxString(wxT("[error] not connected to server\n")));
+        TextCtrl2->AppendText(wxT("[error] not connected to server\n"));
     }
 }
 
 void ClientFrame::OnMenuDisconnect(wxCommandEvent& event)
 {
     if(!m_Client){
-        TextCtrl2->AppendText(wxString(wxT("[warning] already disconnected\n")));
+        TextCtrl2->AppendText(wxT("[warning] already disconnected\n"));
         return;
     }
     if(m_Client->IsOk()){
@@ -230,7 +227,7 @@ void ClientFrame::OnClientSocketEvent(wxSocketEvent & event){
         case wxSOCKET_INPUT:
         socket_slave->Read(msg_buffer, MSG_SIZE*sizeof(char));
         if(socket_slave->Error()){
-            TextCtrl2->AppendText(wxString(wxT("[error] сould not read message\n")));
+            TextCtrl2->AppendText(wxT("[error] сould not read message\n"));
         } else {
             msg_buffer[(size_t)ceil((double)socket_slave->LastCount()/sizeof(char))] = wxT('\0');
             TextCtrl2->AppendText(wxString::Format(wxT("%s\n"), msg_buffer));
@@ -240,8 +237,9 @@ void ClientFrame::OnClientSocketEvent(wxSocketEvent & event){
         if(m_Client == socket_slave){
             m_Client = nullptr;
         }
-        socket_slave->Destroy();
-        TextCtrl2->AppendText(wxString(wxT("[good] disconnected from the server\n")));
+        if(socket_slave->IsOk())
+            socket_slave->Destroy();
+        TextCtrl2->AppendText(wxT("[good] disconnected from the server\n"));
         break;
     }
 }
@@ -267,8 +265,4 @@ void ClientFrame::OnExportMessageUpdateUI(wxUpdateUIEvent & event){
 
 void ClientFrame::OnCleanMessageUpdateUI(wxUpdateUIEvent & event){
     event.Enable(FALSE);
-}
-
-void ClientFrame::OnTextCtrl2Text(wxCommandEvent& event)
-{
 }

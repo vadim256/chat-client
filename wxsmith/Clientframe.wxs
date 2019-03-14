@@ -5,7 +5,7 @@
 		<centered>1</centered>
 		<icon>/home/ameliepulen/project1/chat-client/client_icon.png</icon>
 		<size>500,500</size>
-		<minsize>500,500</minsize>
+		<minsize>350,350</minsize>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
@@ -13,8 +13,7 @@
 						<orient>wxVERTICAL</orient>
 						<object class="sizeritem">
 							<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrl2" member="yes">
-								<style>wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH</style>
-								<handler function="OnTextCtrl2Text" entry="EVT_TEXT" />
+								<style>wxTE_MULTILINE|wxTE_READONLY</style>
 							</object>
 							<flag>wxALL|wxEXPAND</flag>
 							<border>5</border>

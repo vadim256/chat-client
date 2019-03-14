@@ -22,7 +22,7 @@
 #include <cmath>
 #include <wx/socket.h>
 #include <wx/valgen.h>
-#include <memory>
+
 
 class ClientFrame: public wxFrame
 {
@@ -40,7 +40,6 @@ class ClientFrame: public wxFrame
         void OnMenuDisconnect(wxCommandEvent& event);
         void OnExportMessage(wxCommandEvent& event);
         void OnCleanMessage(wxCommandEvent& event);
-        void OnTextCtrl2Text(wxCommandEvent& event);
         //*)
         void OnClientSocketEvent(wxSocketEvent & event);
         void OnExportMessageUpdateUI(wxUpdateUIEvent & event);
