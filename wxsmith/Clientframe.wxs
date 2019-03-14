@@ -3,6 +3,7 @@
 	<object class="wxFrame" name="ClientFrame">
 		<title>chat-client</title>
 		<centered>1</centered>
+		<icon>/home/ameliepulen/project1/chat-client/client_icon.png</icon>
 		<size>500,500</size>
 		<minsize>500,500</minsize>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
@@ -11,12 +12,13 @@
 					<object class="wxBoxSizer" variable="BoxSizer2" member="no">
 						<orient>wxVERTICAL</orient>
 						<object class="sizeritem">
-							<object class="wxSimpleHtmlListBox" name="ID_SIMPLEHTMLLISTBOX1" variable="SimpleHtmlListBox1" member="yes">
-								<default>-1</default>
+							<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrl2" member="yes">
+								<style>wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH</style>
+								<handler function="OnTextCtrl2Text" entry="EVT_TEXT" />
 							</object>
 							<flag>wxALL|wxEXPAND</flag>
-							<border>2</border>
-							<option>3</option>
+							<border>5</border>
+							<option>1</option>
 						</object>
 						<object class="sizeritem">
 							<object class="wxBoxSizer" variable="BoxSizer3" member="no">
@@ -34,6 +36,7 @@
 										<object class="sizeritem">
 											<object class="wxButton" name="ID_BUTTON1" variable="Button1" member="yes">
 												<label>send</label>
+												<handler function="OnExportMessage" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -41,6 +44,7 @@
 										<object class="sizeritem">
 											<object class="wxButton" name="ID_BUTTON2" variable="Button2" member="yes">
 												<label>clean</label>
+												<handler function="OnCleanMessage" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>

@@ -11,10 +11,12 @@
 #define CLIENTAPP_H
 
 #include <wx/app.h>
-
+#include <wx/intl.h>
 class ClientApp : public wxApp
 {
+    wxLocale m_locale;
     public:
+        ClientApp();
         virtual bool OnInit();
 };
 

@@ -17,6 +17,10 @@
 
 IMPLEMENT_APP(ClientApp);
 
+ClientApp::ClientApp(){
+    m_locale.Init(wxLANGUAGE_UKRAINIAN);
+}
+
 bool ClientApp::OnInit()
 {
     //(*AppInitialize

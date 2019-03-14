@@ -12,6 +12,9 @@
 #include <wx/msgdlg.h>
 
 //(*InternalHeaders(ClientFrame)
+#include <wx/bitmap.h>
+#include <wx/icon.h>
+#include <wx/image.h>
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
@@ -43,7 +46,7 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 }
 
 //(*IdInit(ClientFrame)
-const long ClientFrame::ID_SIMPLEHTMLLISTBOX1 = wxNewId();
+const long ClientFrame::ID_TEXTCTRL2 = wxNewId();
 const long ClientFrame::ID_TEXTCTRL1 = wxNewId();
 const long ClientFrame::ID_BUTTON1 = wxNewId();
 const long ClientFrame::ID_BUTTON2 = wxNewId();
@@ -54,10 +57,16 @@ const long ClientFrame::idMenuQuit = wxNewId();
 const long ClientFrame::idMenuAbout = wxNewId();
 const long ClientFrame::ID_STATUSBAR1 = wxNewId();
 //*)
+const long ClientFrame::idSocketClient = wxNewId();
+const long ClientFrame::MSG_SIZE = 1024;
 
 BEGIN_EVENT_TABLE(ClientFrame,wxFrame)
     //(*EventTable(ClientFrame)
     //*)
+    EVT_SOCKET(idSocketClient, ClientFrame::OnClientSocketEvent)
+    EVT_UPDATE_UI(ID_BUTTON1, ClientFrame::OnExportMessageUpdateUI)
+    EVT_UPDATE_UI(ID_BUTTON2, ClientFrame::OnCleanMessageUpdateUI)
+
 END_EVENT_TABLE()
 
 ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
@@ -76,11 +85,16 @@ ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
     Create(parent, id, _("chat-client"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
     SetClientSize(wxSize(500,500));
     SetMinSize(wxSize(500,500));
+    {
+    	wxIcon FrameIcon;
+    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("/home/ameliepulen/project1/chat-client/client_icon.png"))));
+    	SetIcon(FrameIcon);
+    }
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     BoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    SimpleHtmlListBox1 = new wxSimpleHtmlListBox(Panel1, ID_SIMPLEHTMLLISTBOX1, wxDefaultPosition, wxDefaultSize, 0, 0, wxHLB_DEFAULT_STYLE, wxDefaultValidator, _T("ID_SIMPLEHTMLLISTBOX1"));
-    BoxSizer2->Add(SimpleHtmlListBox1, 3, wxALL|wxEXPAND, 2);
+    TextCtrl2 = new wxTextCtrl(Panel1, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    BoxSizer2->Add(TextCtrl2, 1, wxALL|wxEXPAND, 5);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
     TextCtrl1 = new wxTextCtrl(Panel1, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_RICH|wxTE_RICH2|wxSIMPLE_BORDER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     BoxSizer3->Add(TextCtrl1, 1, wxALL|wxEXPAND, 1);
@@ -120,21 +134,27 @@ ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
     Layout();
     Center();
 
+    Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ClientFrame::OnTextCtrl2Text);
+    Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ClientFrame::OnExportMessage);
+    Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ClientFrame::OnCleanMessage);
     Connect(idMenuConnect,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnMenuConnect);
     Connect(idMenuDisconnect,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnMenuDisconnect);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ClientFrame::OnAbout);
     //*)
+    TextCtrl1->SetValidator(wxGenericValidator(&m_ClientMsg));
+    this->Connect(idSocketClient, wxEVT_SOCKET, (wxObjectEventFunction)&ClientFrame::OnClientSocketEvent);
+    m_Client = nullptr;
 }
 
 ClientFrame::~ClientFrame()
 {
     //(*Destroy(ClientFrame)
     //*)
-    if(m_Client){
+    if(m_Client)
         m_Client->Destroy();
-    }
-    m_Client.reset(nullptr);
+
+
 }
 
 void ClientFrame::OnQuit(wxCommandEvent& event)
@@ -150,8 +170,105 @@ void ClientFrame::OnAbout(wxCommandEvent& event)
 
 void ClientFrame::OnMenuConnect(wxCommandEvent& event)
 {
+    if(m_Client){
+        TextCtrl2->AppendText(wxString(wxT("[warning] already joined\n")));
+        return;
+    }
+    wxString hostname = wxGetTextFromUser(wxT("Enter address server"),
+                                          wxT("Connection"), wxT("localhost"));
+    if(hostname.IsEmpty()){
+        TextCtrl2->AppendText(wxString(wxT("[error] server address not entered\n")));
+        return;
+    }
+    wxIPV4address address;
+    address.Service(3000);
+    address.Hostname(hostname);
+
+    m_Client = new wxSocketClient();
+    if(!m_Client){
+        TextCtrl2->AppendText(wxString(wxT("[error] no memory allocated for client\n")));
+        return;
+    }
+    m_Client->SetEventHandler(*this, idSocketClient);
+    m_Client->Notify(wxSOCKET_LOST_FLAG|wxSOCKET_INPUT_FLAG);
+    m_Client->Notify(TRUE);
+
+    if(m_Client->Connect(address, false) == FALSE) return;
+
+    m_Client->WaitOnConnect(3);
+    if(m_Client->IsConnected()){
+        TextCtrl2->AppendText(wxString(wxT("[success] connected to the server\n")));
+    } else {
+	if(m_Client)
+	        delete m_Client;
+        m_Client = nullptr;
+        TextCtrl2->AppendText(wxString(wxT("[error] not connected to server\n")));
+    }
 }
 
 void ClientFrame::OnMenuDisconnect(wxCommandEvent& event)
+{
+    if(!m_Client){
+        TextCtrl2->AppendText(wxString(wxT("[warning] already disconnected\n")));
+        return;
+    }
+    if(m_Client->IsOk()){
+        if(m_Client->IsConnected())
+            m_Client->Close();
+        m_Client->Destroy();
+    }
+    m_Client = nullptr;
+}
+
+void ClientFrame::OnClientSocketEvent(wxSocketEvent & event){
+    auto socket_slave = event.GetSocket();
+    wxIPV4address address;
+    socket_slave->GetLocal(address);
+    char msg_buffer[MSG_SIZE];
+
+    switch(event.GetSocketEvent()){
+        case wxSOCKET_INPUT:
+        socket_slave->Read(msg_buffer, MSG_SIZE*sizeof(char));
+        if(socket_slave->Error()){
+            TextCtrl2->AppendText(wxString(wxT("[error] сould not read message\n")));
+        } else {
+            msg_buffer[(size_t)ceil((double)socket_slave->LastCount()/sizeof(char))] = wxT('\0');
+            TextCtrl2->AppendText(wxString::Format(wxT("%s\n"), msg_buffer));
+        }
+        break;
+        case wxSOCKET_LOST:
+        if(m_Client == socket_slave){
+            m_Client = nullptr;
+        }
+        socket_slave->Destroy();
+        TextCtrl2->AppendText(wxString(wxT("[good] disconnected from the server\n")));
+        break;
+    }
+}
+
+void ClientFrame::OnExportMessage(wxCommandEvent& event)
+{
+    TransferDataFromWindow();
+    if(m_ClientMsg.IsEmpty()){
+        return;
+    }
+    if(m_Client){
+        m_Client->Write(m_ClientMsg.GetData(), m_ClientMsg.Len()/sizeof(char));
+    }
+    m_ClientMsg.Clear();
+    TransferDataToWindow();
+}
+
+void ClientFrame::OnCleanMessage(wxCommandEvent& event) { }
+
+void ClientFrame::OnExportMessageUpdateUI(wxUpdateUIEvent & event){
+    event.Enable(m_Client);
+}
+
+void ClientFrame::OnCleanMessageUpdateUI(wxUpdateUIEvent & event){
+    event.Enable(FALSE);
+}
+
+void ClientFrame::OnTextCtrl2Text(wxCommandEvent& event)
 {
 }
