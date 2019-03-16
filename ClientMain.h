@@ -41,9 +41,12 @@ class ClientFrame: public wxFrame
         void OnExportMessage(wxCommandEvent& event);
         void OnCleanMessage(wxCommandEvent& event);
         //*)
+
         void OnClientSocketEvent(wxSocketEvent & event);
         void OnExportMessageUpdateUI(wxUpdateUIEvent & event);
         void OnCleanMessageUpdateUI(wxUpdateUIEvent & event);
+        void OnMenuConnectUpdateUI(wxUpdateUIEvent& event);
+        void OnMenuDisconnectUpdateUI(wxUpdateUIEvent& event);
         //(*Identifiers(ClientFrame)
         static const long ID_TEXTCTRL2;
         static const long ID_TEXTCTRL1;

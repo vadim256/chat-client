@@ -66,7 +66,8 @@ BEGIN_EVENT_TABLE(ClientFrame,wxFrame)
     EVT_SOCKET(idSocketClient, ClientFrame::OnClientSocketEvent)
     EVT_UPDATE_UI(ID_BUTTON1, ClientFrame::OnExportMessageUpdateUI)
     EVT_UPDATE_UI(ID_BUTTON2, ClientFrame::OnCleanMessageUpdateUI)
-
+    EVT_UPDATE_UI(idMenuConnect, ClientFrame::OnMenuConnectUpdateUI)
+    EVT_UPDATE_UI(idMenuDisconnect, ClientFrame::OnMenuDisconnectUpdateUI)
 END_EVENT_TABLE()
 
 ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
@@ -190,7 +191,9 @@ void ClientFrame::OnMenuConnect(wxCommandEvent& event)
     m_Client->SetNotify(wxSOCKET_LOST_FLAG|wxSOCKET_INPUT_FLAG);
     m_Client->Notify(TRUE);
 
-    if(m_Client->Connect(address, false) == FALSE) return;
+    if(m_Client->Connect(address, false) == FALSE) {
+            return;
+    }
 
     m_Client->WaitOnConnect(3);
     if(m_Client->IsConnected()){
@@ -215,6 +218,7 @@ void ClientFrame::OnMenuDisconnect(wxCommandEvent& event)
         m_Client->Destroy();
     }
     m_Client = nullptr;
+
 }
 
 void ClientFrame::OnClientSocketEvent(wxSocketEvent & event){
@@ -257,12 +261,21 @@ void ClientFrame::OnExportMessage(wxCommandEvent& event)
     TransferDataToWindow();
 }
 
-void ClientFrame::OnCleanMessage(wxCommandEvent& event) { }
+void ClientFrame::OnCleanMessage(wxCommandEvent& event) {
+    TextCtrl1->Clear();
+}
 
 void ClientFrame::OnExportMessageUpdateUI(wxUpdateUIEvent & event){
     event.Enable(m_Client);
 }
 
 void ClientFrame::OnCleanMessageUpdateUI(wxUpdateUIEvent & event){
-    event.Enable(FALSE);
+    event.Enable(m_Client);
+
+}
+void ClientFrame::OnMenuConnectUpdateUI(wxUpdateUIEvent& event){
+    event.Enable(!m_Client);
+}
+void ClientFrame::OnMenuDisconnectUpdateUI(wxUpdateUIEvent& event){
+    event.Enable(m_Client);
 }
