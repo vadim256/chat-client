@@ -87,6 +87,7 @@ ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
     Create(parent, id, _("chat-client"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
     SetClientSize(wxSize(500,500));
     SetMinSize(wxSize(350,350));
+    SetBackgroundColour(wxColour(189,210,225));
     {
     	wxIcon FrameIcon;
     	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("/home/ameliepulen/project1/chat-client/client_icon.png"))));
@@ -96,21 +97,21 @@ ClientFrame::ClientFrame(wxWindow* parent,wxWindowID id)
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     BoxSizer2 = new wxBoxSizer(wxVERTICAL);
     TextCtrl2 = new wxTextCtrl(Panel1, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL2"));
-    BoxSizer2->Add(TextCtrl2, 1, wxALL|wxEXPAND, 5);
+    BoxSizer2->Add(TextCtrl2, 1, wxALL|wxEXPAND, 2);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
     TextCtrl1 = new wxTextCtrl(Panel1, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_RICH|wxTE_RICH2|wxSIMPLE_BORDER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-    BoxSizer3->Add(TextCtrl1, 1, wxALL|wxEXPAND, 1);
+    BoxSizer3->Add(TextCtrl1, 1, wxALL|wxEXPAND, 2);
     BoxSizer4 = new wxBoxSizer(wxVERTICAL);
     Button1 = new wxButton(Panel1, ID_BUTTON1, _("send"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     BoxSizer4->Add(Button1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button2 = new wxButton(Panel1, ID_BUTTON2, _("clean"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     BoxSizer4->Add(Button2, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer3->Add(BoxSizer4, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer2->Add(BoxSizer3, 1, wxALL|wxEXPAND, 5);
+    BoxSizer3->Add(BoxSizer4, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    BoxSizer2->Add(BoxSizer3, 1, wxALL|wxEXPAND, 2);
     Panel1->SetSizer(BoxSizer2);
     BoxSizer2->Fit(Panel1);
     BoxSizer2->SetSizeHints(Panel1);
-    BoxSizer1->Add(Panel1, 1, wxALL|wxEXPAND, 5);
+    BoxSizer1->Add(Panel1, 1, wxALL|wxEXPAND, 2);
     SetSizer(BoxSizer1);
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();

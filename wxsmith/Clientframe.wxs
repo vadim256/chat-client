@@ -5,6 +5,7 @@
 		<centered>1</centered>
 		<icon>/home/ameliepulen/project1/chat-client/client_icon.png</icon>
 		<size>500,500</size>
+		<bg>#BDD2E1</bg>
 		<minsize>350,350</minsize>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 			<object class="sizeritem">
@@ -16,7 +17,7 @@
 								<style>wxTE_MULTILINE|wxTE_READONLY</style>
 							</object>
 							<flag>wxALL|wxEXPAND</flag>
-							<border>5</border>
+							<border>2</border>
 							<option>1</option>
 						</object>
 						<object class="sizeritem">
@@ -26,7 +27,7 @@
 										<style>wxTE_MULTILINE|wxTE_RICH|wxTE_RICH2|wxSIMPLE_BORDER</style>
 									</object>
 									<flag>wxALL|wxEXPAND</flag>
-									<border>1</border>
+									<border>2</border>
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
@@ -50,17 +51,17 @@
 										</object>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
+									<border>2</border>
 								</object>
 							</object>
 							<flag>wxALL|wxEXPAND</flag>
-							<border>5</border>
+							<border>2</border>
 							<option>1</option>
 						</object>
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
+				<border>2</border>
 				<option>1</option>
 			</object>
 		</object>
